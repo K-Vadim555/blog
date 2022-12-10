@@ -67,7 +67,7 @@ const Main = ({posts , setPosts ,amount1 ,amount2 , currency1 , currency2 , rate
       useEffect(() => {
       
         //  axios.get('https://api.apilayer.com/fixer/latest?base=USD&apikey=upQc6y6o1um2O4B8LHn1ZVC0FE9elubP')
-        axios.get('http://api.coinlayer.com/live?access_key=740ed685901055b6cc14eeb1a468233e')
+        axios.get('http://api.coinlayer.com/live?access_key=050a4d58a55e97462d7bd0a74afe1ea5')
         .then(response => {
             setRates(response.data.rates);
           })
