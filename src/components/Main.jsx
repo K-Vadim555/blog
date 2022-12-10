@@ -2,27 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Post from './Post/Post';
 import Btn from './ui/Btn/Btn';
 import Input from './ui/Input/Input';
-
-const Main = () => {
-    let [posts, setPosts] = useState([
-        {
-          id: 1,
-          title: '123',
-          content: 'erfgewpe;ojrrg ihweit hgoiwueth goiuweh toiguheoituhgoieurh tiou hwortui',
-        },
-        {
-          id: 2,
-          title: '123456',
-          content: 'wpe;ojrrg ihweit hgoiwueth goiuweh toiguheoituhgoieurh tiou hwortui',
-        },
-        {
-          id: 3,
-          title: '1234568498749',
-          content: 'wpe;ojrrg ihweit hgoiwueth goiuweh toiguheoituhgoieurh tiou hwortui',
-        },
-      ])
-    
-      
+import axios from 'axios'
+import CurrencyInput from '../cc/CurrencyInput';
+const Main = ({posts , setPosts ,amount1 ,amount2 , currency1 , currency2 , rates,
+  setAmount1,setAmount2,setCurrency1 , setCurrency2 , setRates
+}) => {
+   
+ 
       
     
      
@@ -47,7 +33,7 @@ const Main = () => {
       let [SearchedPosts, setSearchedPosts] = useState([])
       let [searchQuery, setsearchQuery] = useState('')
       useEffect(() => {
-        let arr = [...sortedPosts].filter((post) => (post.title.includes(searchQuery) || (post.content.includes(searchQuery))))
+        let arr = [...sortedPosts].filter((post) => ((post.title.includes(searchQuery)) || (post.content.includes(searchQuery)) || (post.count.includes(searchQuery))))
         setSearchedPosts(arr)
       }, [posts, searchQuery, sortedPosts])
     
@@ -61,6 +47,8 @@ const Main = () => {
             id: Math.random(),
             title: e.target[0].value,
             content: e.target[1].value,
+            count: e.target[2].value,
+            d: e.target[3].value,
           }
     
           console.log(obj);
@@ -69,15 +57,75 @@ const Main = () => {
     
           e.target[0].value = ''
           e.target[1].value = ''
+          e.target[2].value = ''
+          e.target[3].value = ''
         }
+      }
+      
+      
+      
+      useEffect(() => {
+      
+        //  axios.get('https://api.apilayer.com/fixer/latest?base=USD&apikey=upQc6y6o1um2O4B8LHn1ZVC0FE9elubP')
+        axios.get('http://api.coinlayer.com/live?access_key=740ed685901055b6cc14eeb1a468233e')
+        .then(response => {
+            setRates(response.data.rates);
+          })
+      }, []);
+      useEffect(() => {
+        if (!!rates) {
+          function init() {
+            handleAmount1Change(1);
+          }
+          init();
+        }
+      }, [rates]);
+      function format(number) {
+        return number.toFixed(4);
+      }
+      function handleAmount1Change(amount1) {
+        const sum = amount1 * rates[currency1] / rates[currency2]
+        setAmount2(format(sum + sum/100*5));
+        setAmount1(amount1);
+      }
+      function handleCurrency1Change(currency1) {
+        setAmount2(format(amount1 * rates[currency1] / rates[currency2]));
+        setCurrency1(currency1);
+      }
+      function handleAmount2Change(amount2) {
+        const sum1 = amount2 * rates[currency2] / rates[currency1]
+        setAmount1(format(sum1 + sum1/100*5));
+        setAmount2(amount2);
+      }
+      function handleCurrency2Change(currency2) {
+        setAmount1(format(amount2 * rates[currency2] / rates[currency1]));
+        setCurrency2(currency2);
       }
     return (
         <div className="App">
-
+          <div>
+            {SearchedPosts.count}
+          </div>
       <form className="postsForm" onSubmit={(e) => addNewPost(e)}>
-        <Input/>
-        <textarea></textarea>
-
+        
+      <CurrencyInput
+        onAmountChange={handleAmount1Change}
+        onCurrencyChange={handleCurrency1Change}
+        currencies={Object.keys(rates)}
+        amount={amount1}
+        currency={currency1} />
+      <CurrencyInput
+        onAmountChange={handleAmount2Change}
+        onCurrencyChange={handleCurrency2Change}
+        currencies={Object.keys(rates)}
+        amount={amount2}
+        currency={currency2} />
+        <Btn func={() => {
+           setAmount1(amount2);
+           setAmount2(amount1);
+           setCurrency2(currency1);
+           setCurrency1(currency2);
+        }} text={'<>'}/>
         <Btn text={'Сохранить'}/>
       </form>
 
@@ -95,6 +143,9 @@ const Main = () => {
         {SearchedPosts.map((post) => {
           return (
             <Post 
+           
+              
+             
               key={post.id}
               posts={SearchedPosts} 
               setPosts={setPosts} 

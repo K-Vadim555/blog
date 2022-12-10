@@ -3,21 +3,35 @@ import { Outlet, Link } from "react-router-dom";
 import Btn from '../ui/Btn/Btn'
 import "./Post.scss"
 
-export default function Post({ posts, setPosts, post }) {
+export default function Post({ sum1, posts, setPosts, post ,count , }) {
 
     let removePostById = (posts, setPosts, id) => {
         let arr = posts.filter((post) => post.id !== id)
         setPosts([...arr])
     }
-
+    let [d, setd] = useState('')
     return (
         <div key={post.id} className="post">
-            <div className="inner">
-                <h3>{post.title}</h3>
+           
+            <div style={{
+                display:'flex',
+                width:'50%',
+                justifyContent:'space-around'
+            }} className="inner">
+                <div className='pp' > 
                 <p>{post.content}</p>
+                     <h3>{post.title}</h3>
+               
+                </div>
+               <div className="pp">     
+               <p>{post.d}</p>
+                  <p>{post.count }</p>
+             
+               </div>
+              
             </div>
             <div className="btns">-*
-                <Link to={'/posts/' + post.id}>    
+                <Link to={'/posts'}>    
                    <Btn text={'Открыть'} func={() => {}} />
                    </Link>
          
